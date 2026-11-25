@@ -448,8 +448,9 @@ async function runSheet(key) {
     const id = AVATARS[key];
     await normalize(result, photoPath(id), 1600);
     await normalize(result, path.join(DIRS.photos, `${id}_t.jpg`), 520);
-    db.photos = db.photos.filter((p) => p.id !== id);
-    db.photos.unshift({ id, label: AVATAR_LABELS[key], kind: 'photo', source: 'avatar', createdAt: Date.now(), ...(await dims(photoPath(id))) });
+    const size = await dims(photoPath(id));
+    const photo = { id, label: AVATAR_LABELS[key], kind: 'photo', source: 'avatar', createdAt: Date.now(), ...size };
+    db.photos = [photo, ...db.photos.filter((entry) => entry.id !== id)];
     return;
   }
   const base = path.join(DIRS.assets, `${db.sheets[key].ver || a.ver}_${key}`);

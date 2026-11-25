@@ -30,9 +30,21 @@ if (output >= 0) {
 else if (fs.existsSync('person.jpg')) fs.copyFileSync('person.jpg','out.png');
 `;
 
+const slowFullBodyProbe = `#!/usr/bin/env node
+import { spawnSync } from 'node:child_process';
+import { setTimeout as delay } from 'node:timers/promises';
+const args = process.argv.slice(2);
+if (args.at(-1)?.endsWith('/photos/avatarbody.jpg')) await delay(1250);
+const result = spawnSync('ffprobe', args, {
+  env: {...process.env, PATH:process.env.ATELIER_TEST_PATH}, stdio:'inherit',
+});
+process.exit(result.status ?? 1);
+`;
+
 async function launch(dir, executable) {
   const processHandle = spawn(process.execPath, [fileURLToPath(new URL('../server.mjs', import.meta.url))], {
-    env: { ...process.env, PORT: '0', CODEX_BIN: executable, ATELIER_DATA_DIR: dir, ATELIER_AUTO: '0', ATELIER_LIBRARY_AUTO: '0' },
+    env: { ...process.env, PORT: '0', CODEX_BIN: executable,
+      PATH: path.dirname(executable) + path.delimiter + process.env.PATH, ATELIER_TEST_PATH: process.env.PATH, ATELIER_DATA_DIR: dir, ATELIER_AUTO: '0', ATELIER_LIBRARY_AUTO: '0' },
     stdio: ['ignore', 'pipe', 'inherit'],
   });
   const closed = once(processHandle, 'close');
@@ -49,6 +61,7 @@ test('first setup unlocks only after confirming a modeled photo and copies to a 
   t.after(() => rm(dir, { recursive: true, force: true }));
   const executable = path.join(dir, 'codex.mjs');
   await writeFile(executable, fake, { mode: 0o755 });
+  await writeFile(path.join(dir, 'ffprobe'), slowFullBodyProbe, { mode: 0o755 });
   const first = await launch(path.join(dir, 'original'), executable);
   t.after(() => first.stop());
   assert.equal((await first.call('/library')).status, 409);
@@ -71,7 +84,9 @@ test('first setup unlocks only after confirming a modeled photo and copies to a 
   };
   const approved = await awaitState((db) => db.photos.filter(({ slot }) => slot).length === 3);
   assert.equal((await first.call('/setup/build', { method: 'POST' })).status, 200);
-  await awaitState((db) => db.sheets?.avatarBody?.status === 'done');
+  const modeled = await awaitState((db) => db.sheets?.avatarBody?.status === 'done' && db.sheets?.avatarBust?.status === 'done');
+  assert.ok(modeled.photos.some(({ id }) => id === 'avatarbody'), 'concurrent portrait generation must retain the full-body entry');
+  assert.ok(modeled.photos.some(({ id }) => id === 'avatarbust'));
   const jobs = path.join(dir, 'original', 'jobs');
   const avatarJob = (await readdir(jobs)).find((name) => name.startsWith('sheet_avatarBody_'));
   for (const [index, key] of ['face', 'body', 'side'].entries()) {
