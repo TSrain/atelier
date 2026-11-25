@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atelier · 个人形象设计</title>
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/body-editor.css">
+<link rel="stylesheet" href="/onboarding.css">
+</head>
+<body>
+<div class="atmosphere" aria-hidden="true"><i></i><i></i><i></i></div>
+<header class="nav glass">
+  <a class="brand" href="#/home"><em>Atelier</em><span>个人形象设计</span></a>
+  <nav id="nav">
+    <a href="#/home">首页</a>
+    <a href="#/studio">试衣间</a>
+    <a href="#/mine">我的</a>
+  </nav>
+  <div class="nav-status" id="navStatus" role="status" hidden>
+    <span class="nav-progress" hidden><i class="pulse" aria-hidden="true"></i><span></span></span>
+    <a class="task-result nav-completion" hidden><span class="task-result-check" aria-hidden="true">✓</span><span class="task-result-label"></span><span class="task-result-action">查看结果</span></a>
+  </div>
+</header>
+<main id="app"></main>
+<div class="lightbox" id="lightbox" hidden></div>
+<dialog class="archive-dialog" id="reanalyzeDialog" aria-labelledby="reanalyzeTitle" aria-describedby="reanalyzeDescription">
+  <form data-form="reanalyze">
+    <h2 id="reanalyzeTitle">重新分析形象</h2>
+    <p id="reanalyzeDescription">会结合你的意见和已上传的本人照片，更新未锁定的板块。</p>
+    <label for="analysisFeedback">对这次的分析，有什么想调整的？ <small>选填</small></label>
+    <textarea id="analysisFeedback" name="feedback" rows="4" maxlength="500" placeholder="比如：风格定位偏成熟，想多看看更松弛的日常穿搭。" autofocus></textarea>
+    <p class="error archive-dialog-error" role="alert" hidden></p>
+    <div class="archive-dialog-actions">
+      <button class="btn ghost" type="button" data-act="cancelReanalysis">取消</button>
+      <button class="btn primary" type="submit">确认重新分析</button>
+    </div>
+  </form>
+</dialog>
+<dialog class="body-editor" id="bodyEditor" aria-labelledby="bodyEditorTitle">
+  <header class="shape-head"><h2 id="bodyEditorTitle">调整身形</h2><button class="shape-close" type="button" data-shape-action="close" aria-label="关闭身形编辑器">×</button></header>
+  <div class="shape-body"></div>
+  <p class="shape-status" role="status"></p>
+  <div class="shape-footer"></div>
+</dialog>
+<div class="toast glass" id="toast" hidden></div>
+<a class="task-result task-toast" id="taskToast" hidden><span class="task-result-check" aria-hidden="true">✓</span><span class="task-result-label"></span><span class="task-result-action">查看结果</span></a>
+<input type="file" id="file" accept="image/*" multiple hidden>
+<input type="file" id="setupPhoto" accept="image/jpeg,image/png,image/webp" hidden>
+<input type="file" id="studioReference" accept="image/jpeg,image/png,image/webp" hidden>
+<script type="module" src="/app.js"></script>
+</body>
+</html>

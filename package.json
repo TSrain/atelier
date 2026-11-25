@@ -1,0 +1,15 @@
+{
+  "name": "atelier-personal-style",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test"
+  },
+  "version": "0.1.0-beta",
+  "description": "在自己的 Mac 上建模、试穿和管理穿搭",
+  "engines": {
+    "node": ">=24"
+  },
+  "license": "MIT"
+}
